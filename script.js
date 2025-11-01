@@ -1,11 +1,11 @@
 // Структура категорий для BASKET
 const categories = {
     main: [
-        { id: "new", name: "🆕 NEW", hasSubcategories: true },
+        { id: "new", name: "NEW", hasSubcategories: true },
         { id: "clothing", name: "👕 Одежда", hasSubcategories: true },
         { id: "shoes", name: "👟 Обувь", hasSubcategories: true },
-        { id: "accessories", name: "🎒 Аксессуары", hasSubcategories: true },
-        { id: "sale", name: "🔥 SALE", hasSubcategories: false }
+        { id: "accessories", name: "Аксессуары", hasSubcategories: true },
+        { id: "sale", name: "SALE", hasSubcategories: false }
     ],
     
     subcategories: {
@@ -111,14 +111,30 @@ let currentProductGroup = null;
 
 // Инициализация приложения
 function initApp() {
-    console.log("BASKET магазин запущен!");
-    loadProductsFromStorage(); // Сначала загружаем товары
+    console.log("BASKET магазин запущен! ПРИНУДИТЕЛЬНЫЙ СБРОС");
+    
+    // ПРИНУДИТЕЛЬНЫЙ СБРОС СТАРЫХ ДАННЫХ
+    if (window.Telegram && Telegram.WebApp) {
+        const resetKey = 'telegram_reset_done';
+        if (!localStorage.getItem(resetKey)) {
+            localStorage.removeItem('basket_products');
+            localStorage.removeItem('cart');
+            localStorage.setItem(resetKey, 'true');
+            console.log('🔥 Принудительный сброс данных для Telegram');
+        }
+    }
+    
+    loadProductsFromStorage();
     renderMainCategories();
     renderProducts(products.filter(p => p.group === "Куртки"));
     loadCartFromStorage();
     setupEventListeners();
+    
+    // Показываем сообщение о сбросе
+    setTimeout(() => {
+        showNotification('Данные сброшены! Товары обновлены. 🔄');
+    }, 1000);
 }
-
 // Загрузка товаров из localStorage
 function loadProductsFromStorage() {
     const savedProducts = localStorage.getItem('basket_products');
