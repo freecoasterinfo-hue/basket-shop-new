@@ -1,3 +1,27 @@
+// ==================== ПРИНУДИТЕЛЬНАЯ ОЧИСТКА ДАННЫХ TELEGRAM ====================
+console.log('🔥 Принудительная очистка старых данных Telegram');
+
+// УДАЛЯЕМ ВСЕ СТАРЫЕ ДАННЫЕ
+const keysToRemove = [];
+for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key.includes('basket') || key.includes('cart') || key.includes('product')) {
+        keysToRemove.push(key);
+    }
+}
+
+keysToRemove.forEach(key => {
+    localStorage.removeItem(key);
+    console.log('🗑️ Удален ключ:', key);
+});
+
+// СОЗДАЕМ НОВЫЕ УНИКАЛЬНЫЕ КЛЮЧИ
+const SITE_VERSION = 'v4-' + Date.now();
+const PRODUCTS_KEY = `basket_products_${SITE_VERSION}`;
+const CART_KEY = `cart_${SITE_VERSION}`;
+
+console.log('🆕 Новые ключи данных:', PRODUCTS_KEY, CART_KEY);
+
 // Структура категорий для BASKET
 const categories = {
     main: [
@@ -42,65 +66,13 @@ const categories = {
     }
 };
 
-// Базовые товары (используются только при первом запуске)
+// Базовые товары (пустой массив)
 const defaultProducts = [
-    {
-        id: 1,
-        name: "Куртка кожаная черная",
-        price: 12990,
-        category: "clothing_men",
-        group: "Куртки",
-        image: "https://via.placeholder.com/300x300/4a5568/ffffff?text=Leather+Jacket",
-        description: "Кожаная куртка премиум-класса"
-    },
-    {
-        id: 2,
-        name: "Куртка джинсовая",
-        price: 7990,
-        category: "clothing_men", 
-        group: "Куртки",
-        image: "https://via.placeholder.com/300x300/718096/ffffff?text=Denim+Jacket",
-        description: "Стильная джинсовая куртка"
-    },
-    {
-        id: 3,
-        name: "Куртка утепленная",
-        price: 14990,
-        category: "clothing_men",
-        group: "Куртки",
-        image: "https://via.placeholder.com/300x300/2d3748/ffffff?text=Winter+Jacket",
-        description: "Теплая куртка для зимы"
-    },
-    {
-        id: 4,
-        name: "Куртка ветровка",
-        price: 5990,
-        category: "clothing_women",
-        group: "Куртки", 
-        image: "https://via.placeholder.com/300x300/ed8936/ffffff?text=Windbreaker",
-        description: "Легкая ветровка"
-    },
-    {
-        id: 5,
-        name: "Куртка косуха",
-        price: 11990,
-        category: "clothing_women",
-        group: "Куртки",
-        image: "https://via.placeholder.com/300x300/9f7aea/ffffff?text=Biker+Jacket",
-        description: "Стильная косуха"
-    },
-    {
-        id: 6,
-        name: "Куртка парка",
-        price: 16990,
-        category: "new_men",
-        group: "Куртки",
-        image: "https://via.placeholder.com/300x300/ed64a6/ffffff?text=Parka",
-        description: "Новая модель парки"
-    }
+    // ОСТАВЬТЕ ПУСТОЙ МАССИВ ДЛЯ TELEGRAM
+    // Товары будут добавляться через админку
 ];
 
-// Основной массив товаров (будет загружаться из localStorage)
+// Основной массив товаров
 let products = [];
 
 // Переменные состояния
@@ -109,50 +81,39 @@ let currentMainCategory = null;
 let currentSubcategory = null;
 let currentProductGroup = null;
 
+// Загрузка товаров
+function loadProductsFromStorage() {
+    const savedProducts = localStorage.getItem(PRODUCTS_KEY);
+    if (savedProducts) {
+        products = JSON.parse(savedProducts);
+        console.log("Загружены товары:", products.length);
+    } else {
+        products = [...defaultProducts];
+        saveProductsToStorage();
+        console.log("Создан новый пустой список товаров");
+    }
+}
+
+// Сохранение товаров
+function saveProductsToStorage() {
+    localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
+    console.log("Товары сохранены с новым ключом");
+}
+
 // Инициализация приложения
 function initApp() {
-    console.log("BASKET магазин запущен! ПРИНУДИТЕЛЬНЫЙ СБРОС");
+    console.log("🔄 BASKET магазин запущен! Версия данных:", SITE_VERSION);
     
-    // ПРИНУДИТЕЛЬНЫЙ СБРОС СТАРЫХ ДАННЫХ
-    if (window.Telegram && Telegram.WebApp) {
-        const resetKey = 'telegram_reset_done';
-        if (!localStorage.getItem(resetKey)) {
-            localStorage.removeItem('basket_products');
-            localStorage.removeItem('cart');
-            localStorage.setItem(resetKey, 'true');
-            console.log('🔥 Принудительный сброс данных для Telegram');
-        }
-    }
+    // Показываем уведомление о сбросе
+    setTimeout(() => {
+        showNotification('Данные обновлены! Если видите старые товары - используйте "Принудительный сброс" в админке. 🔄');
+    }, 1000);
     
     loadProductsFromStorage();
     renderMainCategories();
     renderProducts(products.filter(p => p.group === "Куртки"));
     loadCartFromStorage();
     setupEventListeners();
-    
-    // Показываем сообщение о сбросе
-    setTimeout(() => {
-        showNotification('Данные сброшены! Товары обновлены. 🔄');
-    }, 1000);
-}
-// Загрузка товаров из localStorage
-function loadProductsFromStorage() {
-    const savedProducts = localStorage.getItem('basket_products');
-    if (savedProducts) {
-        products = JSON.parse(savedProducts);
-        console.log("Загружены товары из localStorage:", products.length);
-    } else {
-        // Первый запуск - используем базовые товары
-        products = [...defaultProducts];
-        saveProductsToStorage();
-        console.log("Использованы базовые товары");
-    }
-}
-
-// Сохранение товаров в localStorage
-function saveProductsToStorage() {
-    localStorage.setItem('basket_products', JSON.stringify(products));
-    console.log("Товары сохранены в localStorage");
 }
 
 // Рендер основных категорий
@@ -311,12 +272,12 @@ function updateCart() {
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
     document.getElementById('cart-count').textContent = totalItems;
     
-    localStorage.setItem('cart', JSON.stringify(cart));
+    localStorage.setItem(CART_KEY, JSON.stringify(cart));
     updateCartModal();
 }
 
 function loadCartFromStorage() {
-    const savedCart = localStorage.getItem('cart');
+    const savedCart = localStorage.getItem(CART_KEY);
     if (savedCart) {
         cart = JSON.parse(savedCart);
         updateCart();
@@ -406,13 +367,12 @@ function setupEventListeners() {
     });
 }
 
-// АДМИНКА С СОХРАНЕНИЕМ ИЗМЕНЕНИЙ И ОБНОВЛЕНИЕМ
+// АДМИНКА С ПРИНУДИТЕЛЬНЫМ СБРОСОМ
 function openSimpleAdmin() {
     const password = prompt('🔐 Введите пароль админа:');
     
     if (password === 'basket123') {
-        // Показываем расширенное меню
-        const action = prompt('Выберите действие:\n1 - Добавить товар\n2 - Редактировать товар\n3 - Удалить товар\n4 - Просмотреть все товары\n5 - 🔄 ОБНОВИТЬ КЭШ (для Telegram)');
+        const action = prompt('Выберите действие:\n1 - Добавить товар\n2 - Редактировать товар\n3 - Удалить товар\n4 - 💥 ПРИНУДИТЕЛЬНЫЙ СБРОС ДЛЯ TELEGRAM');
         
         if (action === '1') {
             addNewProduct();
@@ -421,23 +381,12 @@ function openSimpleAdmin() {
         } else if (action === '3') {
             deleteProduct();
         } else if (action === '4') {
-            viewAllProducts();
-        } else if (action === '5') {
-            clearTelegramCache();
+            forceTelegramReset();
         } else {
             showNotification('Действие отменено');
         }
     } else if (password !== null) {
         showNotification('Неверный пароль! ❌');
-    }
-}
-
-// Функция очистки кэша Telegram
-function clearTelegramCache() {
-    if (confirm('Это принудительно обновит кэш в Telegram. Продолжить?')) {
-        // Добавляем параметр версии к URL
-        const newUrl = window.location.href + (window.location.href.includes('?') ? '&' : '?') + 'v=' + Date.now();
-        window.location.href = newUrl;
     }
 }
 
@@ -469,7 +418,7 @@ function addNewProduct() {
     };
     
     products.push(newProduct);
-    saveProductsToStorage(); // Сохраняем изменения
+    saveProductsToStorage();
     renderProducts(products.filter(p => p.group === "Куртки"));
     showNotification('Товар добавлен! ✅');
 }
@@ -481,7 +430,6 @@ function editProduct() {
         return;
     }
     
-    // Показываем список товаров
     let productList = 'Выберите товар для редактирования:\n\n';
     products.forEach((product, index) => {
         productList += `${index + 1}. ${product.name} - ${product.price} руб. (${product.group})\n`;
@@ -493,7 +441,6 @@ function editProduct() {
     if (index >= 0 && index < products.length) {
         const product = products[index];
         
-        // Запрашиваем новые данные
         const newName = prompt('Новое название товара:', product.name) || product.name;
         const newPrice = prompt('Новая цена:', product.price) || product.price;
         const newCategory = prompt('Новая категория:', product.category) || product.category;
@@ -501,7 +448,6 @@ function editProduct() {
         const newDescription = prompt('Новое описание:', product.description) || product.description;
         const newImage = prompt('Новый URL изображения:', product.image) || product.image;
         
-        // Обновляем товар
         products[index] = {
             ...product,
             name: newName,
@@ -512,7 +458,7 @@ function editProduct() {
             image: newImage
         };
         
-        saveProductsToStorage(); // Сохраняем изменения
+        saveProductsToStorage();
         renderProducts(products.filter(p => p.group === "Куртки"));
         showNotification('Товар обновлен! ✏️');
     } else if (productIndex !== null) {
@@ -527,7 +473,6 @@ function deleteProduct() {
         return;
     }
     
-    // Показываем список товаров
     let productList = 'Выберите товар для удаления:\n\n';
     products.forEach((product, index) => {
         productList += `${index + 1}. ${product.name} - ${product.price} руб.\n`;
@@ -540,7 +485,7 @@ function deleteProduct() {
         const productName = products[index].name;
         if (confirm(`Удалить товар "${productName}"?`)) {
             products.splice(index, 1);
-            saveProductsToStorage(); // Сохраняем изменения
+            saveProductsToStorage();
             renderProducts(products.filter(p => p.group === "Куртки"));
             showNotification('Товар удален! 🗑️');
         }
@@ -549,19 +494,18 @@ function deleteProduct() {
     }
 }
 
-// Просмотр всех товаров
-function viewAllProducts() {
-    if (products.length === 0) {
-        alert('Нет товаров для просмотра!');
-        return;
+// Принудительный сброс для Telegram
+function forceTelegramReset() {
+    if (confirm('💥 ЭТО УДАЛИТ ВСЕ ТОВАРЫ И КОРЗИНУ В TELEGRAM!\n\nПосле этого нужно:\n1. Закрыть Web App\n2. Открыть заново через бота\n\nПродолжить?')) {
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.includes('basket') || key.includes('cart') || key.includes('product')) {
+                localStorage.removeItem(key);
+            }
+        }
+        
+        showNotification('Данные сброшены! Закройте и откройте приложение заново. 🔄');
     }
-    
-    let productList = 'Все товары в магазине:\n\n';
-    products.forEach((product, index) => {
-        productList += `${index + 1}. ${product.name} - ${product.price} руб. (${product.category}, ${product.group})\n`;
-    });
-    
-    alert(productList);
 }
 
 // Инициализация при загрузке
