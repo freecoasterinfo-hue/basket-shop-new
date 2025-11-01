@@ -1,4 +1,4 @@
-// ==================== ПРИНУДИТЕЛЬНАЯ ОЧИСТКА ДАННЫХ TELEGRAM ====================
+/// ==================== ПРИНУДИТЕЛЬНАЯ ОЧИСТКА ДАННЫХ TELEGRAM ====================
 console.log('🔥 Принудительная очистка старых данных Telegram');
 
 // УДАЛЯЕМ ВСЕ СТАРЫЕ ДАННЫЕ
@@ -25,11 +25,11 @@ console.log('🆕 Новые ключи данных:', PRODUCTS_KEY, CART_KEY);
 // Структура категорий для BASKET
 const categories = {
     main: [
-        { id: "new", name: "NEW", hasSubcategories: true },
+        { id: "new", name: "🆕 NEW", hasSubcategories: true },
         { id: "clothing", name: "👕 Одежда", hasSubcategories: true },
         { id: "shoes", name: "👟 Обувь", hasSubcategories: true },
-        { id: "accessories", name: "Аксессуары", hasSubcategories: true },
-        { id: "sale", name: "SALE", hasSubcategories: false }
+        { id: "accessories", name: "🎒 Аксессуары", hasSubcategories: true },
+        { id: "sale", name: "🔥 SALE", hasSubcategories: false }
     ],
     
     subcategories: {
