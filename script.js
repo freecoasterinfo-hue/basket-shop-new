@@ -102,6 +102,7 @@ function saveProductsToStorage() {
 
 // Инициализация приложения
 function initApp() {
+<<<<<<< HEAD
     console.log("🔄 BASKET магазин запущен! Версия данных:", SITE_VERSION);
     
     // Показываем уведомление о сбросе
@@ -110,10 +111,37 @@ function initApp() {
     }, 1000);
     
     loadProductsFromStorage();
+=======
+    console.log("BASKET магазин запущен!");
+    loadProductsFromStorage(); // Сначала загружаем товары
+>>>>>>> parent of 0a61dfb (sbros cash)
     renderMainCategories();
     renderProducts(products.filter(p => p.group === "Куртки"));
     loadCartFromStorage();
     setupEventListeners();
+<<<<<<< HEAD
+=======
+}
+
+// Загрузка товаров из localStorage
+function loadProductsFromStorage() {
+    const savedProducts = localStorage.getItem('basket_products');
+    if (savedProducts) {
+        products = JSON.parse(savedProducts);
+        console.log("Загружены товары из localStorage:", products.length);
+    } else {
+        // Первый запуск - используем базовые товары
+        products = [...defaultProducts];
+        saveProductsToStorage();
+        console.log("Использованы базовые товары");
+    }
+}
+
+// Сохранение товаров в localStorage
+function saveProductsToStorage() {
+    localStorage.setItem('basket_products', JSON.stringify(products));
+    console.log("Товары сохранены в localStorage");
+>>>>>>> parent of 0a61dfb (sbros cash)
 }
 
 // Рендер основных категорий
