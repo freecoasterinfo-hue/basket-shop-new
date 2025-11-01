@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BASKET - Магазин одежды и обуви</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Шапка -->
+        <header class="header">
+            <div class="logo">
+                <h1>🛍️ BASKET</h1>
+                <span class="tagline">Style in every detail</span>
+            </div>
+            <div class="user-info">
+                <div class="cart" id="cart-btn">
+                    🛒 <span id="cart-count">0</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Навигация по категориям -->
+        <nav class="main-categories" id="main-categories">
+            <!-- Основные категории -->
+        </nav>
+
+        <!-- Подкатегории -->
+        <div class="subcategories" id="subcategories">
+            <!-- Подкатегории будут появляться при выборе основной категории -->
+        </div>
+
+        <!-- Товарные группы -->
+        <div class="product-groups" id="product-groups">
+            <!-- Товарные группы для подкатегорий -->
+        </div>
+
+        <!-- Сетка товаров -->
+        <div class="products-grid" id="products">
+            <!-- Товары -->
+        </div>
+
+        <!-- Кнопка Admin -->
+        <div style="text-align: center; margin: 20px 0;">
+            <button class="btn btn-success" onclick="openSimpleAdmin()" 
+                    style="padding: 12px 24px; font-size: 16px; margin: 10px;">
+                🔧 Admin
+            </button>
+        </div>
+
+        <!-- Корзина -->
+        <div class="cart-modal" id="cart-modal">
+            <div class="cart-content">
+                <div class="cart-header">
+                    <h2>🛒 Ваша корзина</h2>
+                    <button class="close-btn" id="close-cart">×</button>
+                </div>
+                <div class="cart-items" id="cart-items">
+                    <!-- Товары в корзине -->
+                </div>
+                <div class="cart-total">
+                    <strong>Итого: <span id="total-price">0</span> руб.</strong>
+                </div>
+                <div class="cart-actions">
+                    <button class="btn btn-primary" onclick="checkout()">✅ Оформить заказ</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Уведомление -->
+        <div class="notification" id="notification"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
